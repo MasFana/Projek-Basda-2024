@@ -3,6 +3,7 @@ import psycopg2
 from .config import config
 import os
 
+# ssl._create_default_https_context = ssl._create_unverified_context
 current_dir = os.path.dirname(os.path.abspath(__file__))
 config_file = os.path.join(current_dir, "database.ini")
 config = config(config_file)
