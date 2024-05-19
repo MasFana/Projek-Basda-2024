@@ -1,8 +1,11 @@
+from sys import version
 import psycopg2
+from DB.config import config
 
+config = config("DB/database.ini")
 class Database:
-    def __init__(self, dbname, user, password, host, port):
-        self.dbname = dbname
+    def __init__(self, host, database, user, password, port):
+        self.database = database
         self.user = user
         self.password = password
         self.host = host
@@ -13,14 +16,17 @@ class Database:
     def connect(self):
         try:
             self.connection = psycopg2.connect(
-                dbname=self.dbname,
+                database=self.database,
                 user=self.user,
                 password=self.password,
                 host=self.host,
                 port=self.port
             )
             self.cursor = self.connection.cursor()
-            print("Connected to the database successfully!")
+            self.cursor.execute("SELECT version();")
+            self.connection.commit()
+            version = self.cursor.fetchone()
+            print("Connected to the database.",version)
         except (Exception, psycopg2.Error) as error:
             print("Error while connecting to PostgreSQL:", error)
 
@@ -30,7 +36,7 @@ class Database:
             self.connection.close()
             print("Disconnected from the database.")
 
-    def execute_query(self, query):
+    def execute(self, query):
         try:
             self.cursor.execute(query)
             self.connection.commit()
@@ -43,3 +49,7 @@ class Database:
         for row in rows:
             print(row)
             
+db = Database(**config)
+db.connect()
+db.execute("SELECT * FROM public.mata_kuliah")
+db.fetch_data()
