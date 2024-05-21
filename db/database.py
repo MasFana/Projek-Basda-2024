@@ -1,4 +1,3 @@
-import ssl
 import psycopg2
 from .config import config
 import os
@@ -52,6 +51,4 @@ class Database:
 
     def fetch_data(self):
         rows = self.cursor.fetchall()
-        for row in rows:
-            print(row)
-            
+        return rows            
