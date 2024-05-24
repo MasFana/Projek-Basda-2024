@@ -17,15 +17,15 @@ class Database:
         self.connection = None
         self.cursor = None
 
-    def connect(self):
+    def open(self):
         try:
             self.connection = psycopg2.connect(
                 database=self.database,
                 user=self.user,
                 password=self.password,
                 host=self.host,
-                port=self.port
-                # sslmode='require'
+                port=self.port,
+                sslmode='require'
             )
             self.cursor = self.connection.cursor()
             self.cursor.execute("SELECT version();")
@@ -35,17 +35,22 @@ class Database:
         except (Exception, psycopg2.Error) as error:
             print("Koneksi database gagal:", error)
 
-    def disconnect(self):
+    def close(self):
         if self.connection:
             self.cursor.close()
             self.connection.close()
             print("Terputus dari database.")
 
-    def execute(self, query):
+    def execute(self, query,params=None):
         try:
-            self.cursor.execute(query)
-            self.connection.commit()
-            print("Query berhasil!")
+            if params != None:
+                self.cursor.execute(query,params)
+                self.connection.commit()
+                print("Query berhasil!")
+            else:
+                self.cursor.execute(query)
+                self.connection.commit()
+                print("Query berhasil!")
         except (Exception, psycopg2.Error) as error:
             print("Query gagal:", error)
 
