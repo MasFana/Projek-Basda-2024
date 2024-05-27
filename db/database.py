@@ -61,3 +61,19 @@ class Database:
         except (Exception, psycopg2.Error) as error:
             print("Fetch data gagal:", error)
             return False
+    
+    def fetch_one(self):
+        try:
+            rows = self.cursor.fetchone()
+            return rows
+        except (Exception, psycopg2.Error) as error:
+            return False
+
+
+# db = Database()
+
+# db.open()
+# db.execute("SELECT * FROM users")
+# rows = db.fetch_one()
+# print(rows)
+# db.close()

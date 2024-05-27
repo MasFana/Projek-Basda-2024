@@ -1,11 +1,12 @@
 from db.database import Database
-from src.login import login, view_password
+from src.login import *
+from src.mahasiswa import *
 db = Database()
 db.open()
 
 
 # view_password(db)
-login(db)
+# login(db)
 def menu_admin():
     pass
 def menu_penghuni():
@@ -24,5 +25,10 @@ def menu_login():
     else:
         print(f"Halo Admin {nama_user}")
     
+    
+print(db.execute("SELECT * FROM fakultas"))
+print(db.fetch_data())
 
+print(check_fakultas_exists(db, "Fakultas Teknik"))
+# print(create_fakultas(db, "Fakultas Teknik"))
 db.close()
