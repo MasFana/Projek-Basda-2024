@@ -1,18 +1,28 @@
 from db.database import Database
-from src.login import login
+from src.login import login, view_password
 db = Database()
 db.open()
 
 
-try:
-    nama_user,role = login(db)
-except:
-    nama_user,role = None,None
+# view_password(db)
+login(db)
+def menu_admin():
+    pass
+def menu_penghuni():
+    pass
+def menu_pengunjung():
+    pass
     
-if role == :
-    print("Halo penghuni")
-else:
-    print("Halo Admin")
+def menu_login():
+    try:
+        nama_user,role = login(db)
+    except:
+        nama_user,role = None,None
+
+    if role == "penghuni" :
+        print(f"Halo {nama_user}")
+    else:
+        print(f"Halo Admin {nama_user}")
     
 
 db.close()

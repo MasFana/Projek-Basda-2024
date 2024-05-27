@@ -55,5 +55,9 @@ class Database:
             print("Query gagal:", error)
 
     def fetch_data(self):
-        rows = self.cursor.fetchall()
-        return rows            
+        try:
+            rows = self.cursor.fetchall()
+            return rows
+        except (Exception, psycopg2.Error) as error:
+            print("Fetch data gagal:", error)
+            return False
