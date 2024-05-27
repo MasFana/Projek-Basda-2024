@@ -1,7 +1,3 @@
-def create_alamat(db, jalan, kota, kode_pos, provinsi):
-    query = "INSERT INTO alamat (jalan, kota, kode_pos, provinsi) VALUES (%s, %s, %s, %s) RETURNING id_alamat"
-    db.execute(query, (jalan, kota, kode_pos, provinsi))
-    return db.fetch_one()[0]
 
 def create_universitas(db, nama_universitas):
     query = "INSERT INTO universitas (nama_universitas) VALUES (%s) RETURNING id_universitas"
@@ -50,6 +46,11 @@ def create_or_get_role(db, nama_role):
     if existing:
         return existing[0]
     return create_role(db, nama_role)
+
+def create_alamat(db, jalan, kota, kode_pos, provinsi):
+    query = "INSERT INTO alamat (jalan, kota, kode_pos, provinsi) VALUES (%s, %s, %s, %s) RETURNING id_alamat"
+    db.execute(query, (jalan, kota, kode_pos, provinsi))
+    return db.fetch_one()[0]
 
 def create_user(db, id_user, nama_user, no_telepon, id_alamat, durasi_huni, id_universitas, id_fakultas, id_role, no_kamar):
     query = """
@@ -109,7 +110,7 @@ def register_user(db):
 
         except Exception as e:
             # Rollback transaction on error
-            db.connection.rollback()
+            db.connection.rollback() 
             db.close()
             print("Registrasi Gagal:", e)
             return None
