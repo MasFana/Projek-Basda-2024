@@ -25,13 +25,14 @@ def view_password(db):
     query = "SELECT id_user,nama_user FROM users;"
     db.execute(query)
     data = db.fetch_data()
-    if data:
-        data = [list(t) for t in data]
-        for i,d in enumerate(data):
-            data[i].append(encrypt(d[0], d[1][0]))
-            dat = pd.DataFrame(data, columns=["id_user","nama_user","password"])
-            return dat
-    else:
+    try:
+        if data:
+            data = [list(t) for t in data]
+            for i,d in enumerate(data):
+                data[i].append(encrypt(d[0], d[1][0]))
+                dat = pd.DataFrame(data, columns=["id_user","nama_user","password"])
+                return dat
+    except:
         return False
         
 def encrypt(int_list, key):

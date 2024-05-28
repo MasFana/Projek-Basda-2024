@@ -46,11 +46,9 @@ class Database:
             if params != None:
                 self.cursor.execute(query,params)
                 self.connection.commit()
-                print("Query berhasil!")
             else:
                 self.cursor.execute(query)
                 self.connection.commit()
-                print("Query berhasil!")
         except (Exception, psycopg2.Error) as error:
             print("Query gagal:", error)
 
