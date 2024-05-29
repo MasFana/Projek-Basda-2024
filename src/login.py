@@ -30,8 +30,8 @@ def view_password(db):
             data = [list(t) for t in data]
             for i,d in enumerate(data):
                 data[i].append(encrypt(d[0], d[1][0]))
-                dat = pd.DataFrame(data, columns=["id_user","nama_user","password"])
-                return dat
+            dat = pd.DataFrame(data, columns=["id_user","nama_user","password"])
+            return dat
     except:
         return False
         

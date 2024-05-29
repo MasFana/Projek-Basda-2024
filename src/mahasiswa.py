@@ -1,5 +1,11 @@
 import pandas as pd
 
+def print_kamar(db):
+    db.execute("SELECT * FROM kamar")
+    data = db.fetch_data()
+    df = pd.DataFrame(data, columns=['no_kamar', 'Status', 'Harga']) 
+    print(df)
+
 def create_universitas(db, nama_universitas):
     query = "INSERT INTO universitas (nama_universitas) VALUES (%s) RETURNING id_universitas"
     db.execute(query, (nama_universitas,))
@@ -15,35 +21,35 @@ def create_role(db, nama_role):
     db.execute(query, (nama_role,))
     return db.fetch_one()[0]
 
-def check_universitas_exists(self, nama_universitas):
+def check_universitas_exists(db, nama_universitas):
     query = "SELECT id_universitas FROM universitas WHERE nama_universitas ILIKE %s"
-    self.execute(query, ('%' + nama_universitas + '%',))
-    return self.fetch_one()[0]
+    db.execute(query, ('%' + nama_universitas + '%',))
+    return db.fetch_one()[0]
 
-def check_fakultas_exists(self, nama_fakultas):
+def check_fakultas_exists(db, nama_fakultas):
     query = "SELECT id_fakultas FROM fakultas WHERE nama_fakultas ILIKE %s"
-    self.execute(query, ('%' + nama_fakultas + '%',))
-    return self.fetch_one()[0]
+    db.execute(query, ('%' + nama_fakultas + '%',))
+    return db.fetch_one()[0]
 
-def check_role_exists(self, nama_role):
+def check_role_exists(db, nama_role):
     query = "SELECT id_role FROM role WHERE nama_role ILIKE %s"
-    self.execute(query, ('%' + nama_role + '%',))
-    return self.fetch_one()[0]
+    db.execute(query, ('%' + nama_role + '%',))
+    return db.fetch_one()[0]
 
 def create_or_get_universitas(db, nama_universitas):
-    existing = db.check_universitas_exists(nama_universitas)
+    existing = check_universitas_exists(db,nama_universitas)
     if existing:
         return existing[0]
     return create_universitas(db, nama_universitas)
 
 def create_or_get_fakultas(db, nama_fakultas):
-    existing = db.check_fakultas_exists(nama_fakultas)
+    existing = check_fakultas_exists(db,nama_fakultas)
     if existing:
         return existing[0]
     return create_fakultas(db, nama_fakultas)
 
 def create_or_get_role(db, nama_role):
-    existing = db.check_role_exists(nama_role)
+    existing = check_role_exists(db,nama_role)
     if existing:
         return existing[0]
     return create_role(db, nama_role)
@@ -62,7 +68,9 @@ def create_user(db, id_user, nama_user, no_telepon, id_alamat, durasi_huni, id_u
     return db.fetch_one()[0]
 
 def register_user(db):
-    try:        
+    try:   
+        role = 'penghuni'
+        nokamar = ''
         user_details = {
             'id_user': int(input("Masukkan ID Pengguna: ")),
             'nama_user': input("Masukkan Nama Pengguna: "),
@@ -74,10 +82,11 @@ def register_user(db):
             'durasi_huni': input("Masukkan Durasi Huni (YYYY-MM-DD): "),
             'nama_universitas': input("Masukkan Nama Universitas: "),
             'nama_fakultas': input("Masukkan Nama Fakultas: "),
-            'nama_role': input("Masukkan Peran: "),
-            'no_kamar': int(input("Masukkan Nomor Kamar: "))
+            'nama_role': role,
+            'no_kamar': nokamar
         }
-    
+        print_kamar(db)
+        nokamar = input("Masukkan Nomor Kamar: ")
         try:
             # Begin transaction
             db.connection.autocommit = False
