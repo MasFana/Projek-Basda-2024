@@ -101,7 +101,7 @@ def register_user(db):
             'nama_universitas': input("Masukkan Nama Universitas: "),
             'nama_fakultas': input("Masukkan Nama Fakultas: "),
             'nama_role': role,
-            'no_kamar': nokamar 
+            'no_kamar': daftar_kamar() 
         }
         
         try:
