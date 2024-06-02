@@ -15,10 +15,12 @@ def login(db):
     data = db.fetch_data()
     data = data[0] if data else False
     if data:
+        data = list(data)
+        data.append(int(password))
         print(f"Login berhasil ",data)
         return data
     else:
-        print("Login gagal")
+        print("Login gagal",data)
         return data
         
 def view_password(db):
@@ -36,6 +38,7 @@ def view_password(db):
         return False
         
 def encrypt(int_list, key):
+    key = key.lower()
     int_list = map(int,list(str(int_list)))
     key_value = ord(key) - ord('a')
     encrypted_list = [chr((i + key_value) % 26 + ord('a')) for i in int_list]
@@ -43,6 +46,7 @@ def encrypt(int_list, key):
     return encrypted_list
 
 def decrypt(encrypted_list, key):
+    key = key.lower()
     encrypted_list = list(encrypted_list)
     key_value = ord(key) - ord('a')
     decrypted_list = [(ord(i) - ord('a') - key_value) % 26 for i in encrypted_list]
