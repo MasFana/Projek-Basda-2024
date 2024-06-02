@@ -3,53 +3,62 @@ import pandas as pd
 def print_kamar(db):
     db.execute("SELECT * FROM kamar")
     data = db.fetch_data()
-    df = pd.DataFrame(data, columns=['no_kamar', 'Status', 'Harga']) 
+    df = pd.DataFrame(data, columns=['no_kamar', 'Status', 'Harga'])
     print(df)
 
 def create_universitas(db, nama_universitas):
     query = "INSERT INTO universitas (nama_universitas) VALUES (%s) RETURNING id_universitas"
     db.execute(query, (nama_universitas,))
-    return db.fetch_one()[0]
+    result = db.fetch_one()
+    if result:
+        return result[0]
+    return None
 
 def create_fakultas(db, nama_fakultas):
     query = "INSERT INTO fakultas (nama_fakultas) VALUES (%s) RETURNING id_fakultas"
     db.execute(query, (nama_fakultas,))
-    return db.fetch_one()[0]
+    result = db.fetch_one()
+    if result:
+        return result[0]
+    return None
 
 def create_role(db, nama_role):
     query = "INSERT INTO role (nama_role) VALUES (%s) RETURNING id_role"
     db.execute(query, (nama_role,))
-    return db.fetch_one()[0]
+    result = db.fetch_one()
+    if result:
+        return result[0]
+    return None
 
 def check_universitas_exists(db, nama_universitas):
     query = "SELECT id_universitas FROM universitas WHERE nama_universitas ILIKE %s"
     db.execute(query, ('%' + nama_universitas + '%',))
-    return db.fetch_one()[0]
+    return db.fetch_one()
 
 def check_fakultas_exists(db, nama_fakultas):
     query = "SELECT id_fakultas FROM fakultas WHERE nama_fakultas ILIKE %s"
     db.execute(query, ('%' + nama_fakultas + '%',))
-    return db.fetch_one()[0]
+    return db.fetch_one()
 
 def check_role_exists(db, nama_role):
     query = "SELECT id_role FROM role WHERE nama_role ILIKE %s"
     db.execute(query, ('%' + nama_role + '%',))
-    return db.fetch_one()[0]
+    return db.fetch_one()
 
 def create_or_get_universitas(db, nama_universitas):
-    existing = check_universitas_exists(db,nama_universitas)
+    existing = check_universitas_exists(db, nama_universitas)
     if existing:
         return existing[0]
     return create_universitas(db, nama_universitas)
 
 def create_or_get_fakultas(db, nama_fakultas):
-    existing = check_fakultas_exists(db,nama_fakultas)
+    existing = check_fakultas_exists(db, nama_fakultas)
     if existing:
         return existing[0]
     return create_fakultas(db, nama_fakultas)
 
 def create_or_get_role(db, nama_role):
-    existing = check_role_exists(db,nama_role)
+    existing = check_role_exists(db, nama_role)
     if existing:
         return existing[0]
     return create_role(db, nama_role)
@@ -57,7 +66,10 @@ def create_or_get_role(db, nama_role):
 def create_alamat(db, jalan, kota, kode_pos, provinsi):
     query = "INSERT INTO alamat (jalan, kota, kode_pos, provinsi) VALUES (%s, %s, %s, %s) RETURNING id_alamat"
     db.execute(query, (jalan, kota, kode_pos, provinsi))
-    return db.fetch_one()[0]
+    result = db.fetch_one()
+    if result:
+        return result[0]
+    return None
 
 def create_user(db, id_user, nama_user, no_telepon, id_alamat, durasi_huni, id_universitas, id_fakultas, id_role, no_kamar):
     query = """
@@ -65,12 +77,15 @@ def create_user(db, id_user, nama_user, no_telepon, id_alamat, durasi_huni, id_u
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id_user
     """
     db.execute(query, (id_user, nama_user, no_telepon, id_alamat, durasi_huni, id_universitas, id_fakultas, id_role, no_kamar))
-    return db.fetch_one()[0]
+    result = db.fetch_one()
+    if result:
+        return result[0]
+    return None
 
 def register_user(db):
-    try:   
+    try:
         role = 'penghuni'
-        nokamar = ''
+        nokamar
         user_details = {
             'id_user': int(input("Masukkan ID Pengguna: ")),
             'nama_user': input("Masukkan Nama Pengguna: "),
@@ -83,36 +98,47 @@ def register_user(db):
             'nama_universitas': input("Masukkan Nama Universitas: "),
             'nama_fakultas': input("Masukkan Nama Fakultas: "),
             'nama_role': role,
-            'no_kamar': nokamar
+            'no_kamar': nokamar 
         }
-        print_kamar(db)
-        nokamar = input("Masukkan Nomor Kamar: ")
+        print(print_kamar())
+        nokamar = input(" Pilih No Kamar")
+        
         try:
             # Begin transaction
             db.connection.autocommit = False
 
             # Create alamat
             id_alamat = create_alamat(db, user_details['jalan'], user_details['kota'], user_details['kode_pos'], user_details['provinsi'])
-            
+            if not id_alamat:
+                raise ValueError("Failed to create address")
+
             # Create or get universitas
             id_universitas = create_or_get_universitas(db, user_details['nama_universitas'])
-            
+            if not id_universitas:
+                raise ValueError("Failed to create or get university")
+
             # Create or get fakultas
             id_fakultas = create_or_get_fakultas(db, user_details['nama_fakultas'])
-            
+            if not id_fakultas:
+                raise ValueError("Failed to create or get faculty")
+
             # Create or get role
             id_role = create_or_get_role(db, user_details['nama_role'])
-            
+            if not id_role:
+                raise ValueError("Failed to create or get role")
+
             # Create user
-            id_user = create_user(db, user_details['id_user'], user_details['nama_user'], user_details['no_telepon'], id_alamat, 
-                                  user_details['durasi_huni'], id_universitas, id_fakultas, id_role, user_details['no_kamar'])
+            id_user = create_user(db, user_details['id_user'], user_details['nama_user'], user_details['no_telepon'], id_alamat, user_details['durasi_huni'], id_universitas, id_fakultas, id_role, user_details['no_kamar'])
+            if not id_user:
+                raise ValueError("Failed to create user")
+            
             # Commit transaction
             db.connection.commit()
             print("Registrasi Berhasil:")
             print("ID Pengguna:", id_user)
             print("Nama Pengguna:", user_details['nama_user'])
             print("Nomor Telepon:", user_details['no_telepon'])
-            print("Alamat:", user_details['jalan'] + ", " + user_details['kota'] + ", " + user_details['provinsi'] + ", " + str(user_details['kode_pos']))
+            print("Alamat:", f"{user_details['jalan']}, {user_details['kota']}, {user_details['provinsi']}, {user_details['kode_pos']}")
             print("Durasi Huni:", user_details['durasi_huni'])
             print("Universitas:", user_details['nama_universitas'])
             print("Fakultas:", user_details['nama_fakultas'])
@@ -122,14 +148,14 @@ def register_user(db):
 
         except Exception as e:
             # Rollback transaction on error
-            db.connection.rollback() 
-            db.close()
+            db.connection.rollback()
             print("Registrasi Gagal:", e)
             return None
-        
-    except:
-        print("Input tidak valid.")        
 
+    except ValueError:
+        print("Input tidak valid.")
+        
+        
 def view_all_users(db):
     try:
         # Ambil ID pengguna, nama pengguna, dan nomor kamar
