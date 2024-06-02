@@ -166,7 +166,7 @@ def view_all_users(db):
         # Ambil detail pengguna yang dipilih dengan menggabungkan tabel
         selected_user_query = """
         SELECT u.id_user, u.nama_user, u.no_telepon, a.jalan, a.kota, a.kode_pos, a.provinsi,
-               u.durasi_huni, un.nama_universitas, f.nama_fakultas, r.nama_role, u.no_kamar
+        u.durasi_huni, un.nama_universitas, f.nama_fakultas, r.nama_role, u.no_kamar
         FROM users u
         JOIN alamat a ON u.id_alamat = a.id_alamat
         LEFT JOIN universitas un ON u.id_universitas = un.id_universitas
@@ -207,4 +207,150 @@ def view_all_users(db):
             print()
     except Exception as e:
         print("Error:", e)
+
+
+def edit_users(db):
+    try:
+        # Ambil ID pengguna, nama pengguna, dan nomor kamar
+        query = """
+        SELECT u.id_user, u.nama_user, u.no_kamar
+        FROM users u
+        WHERE u.id_role = 1
+        """
+        db.execute(query)
+        users_data = db.fetch_data()
+
+        # Membuat DataFrame dari hasil query
+        columns = ['ID Pengguna', 'Nama Pengguna', 'Nomor Kamar']
+        users_df = pd.DataFrame(users_data, columns=columns)
+
+        # Mengubah nilai yang kosong menjadi 0 dan mengonversi kolom Nomor Kamar menjadi integer
+        users_df['Nomor Kamar'] = users_df['Nomor Kamar'].fillna(0).astype(int)
+
+        # Tampilkan daftar semua penghuni beserta indeks
+        print("Daftar Semua Penghuni:")
+        print(users_df)
+        # Biarkan pengguna memilih indeks dari DataFrame
+        selected_index = int(input("\nPilih indeks pengguna untuk diedit: "))
+
+        # Periksa apakah indeks yang dipilih valid
+        if selected_index < 0 or selected_index >= len(users_df):
+            print("Indeks tidak valid.")
+            return
+
+        # Dapatkan ID pengguna berdasarkan indeks yang dipilih
+        selected_user_id = users_df.loc[selected_index, 'ID Pengguna']
+
+        # Ambil detail pengguna yang dipilih dengan menggabungkan tabel
+        selected_user_query = """
+        SELECT u.id_user, u.nama_user, u.no_telepon, a.jalan, a.kota, a.kode_pos, a.provinsi,
+               u.durasi_huni, un.nama_universitas, f.nama_fakultas, r.nama_role, u.no_kamar
+        FROM users u
+        JOIN alamat a ON u.id_alamat = a.id_alamat
+        LEFT JOIN universitas un ON u.id_universitas = un.id_universitas
+        LEFT JOIN fakultas f ON u.id_fakultas = f.id_fakultas
+        LEFT JOIN role r ON u.id_role = r.id_role
+        WHERE u.id_user = %s and u.id_role=1
+        """
+        db.execute(selected_user_query, (int(selected_user_id),))
+        selected_user_data = db.fetch_data()
+
+        if not selected_user_data:
+            print("Pengguna dengan ID", selected_user_id, "tidak ditemukan.")
+            return
+
+        # Menambahkan kolom untuk detail pengguna
+        detail_columns = ['ID Pengguna', 'Nama Pengguna', 'Nomor Telepon', 'Jalan', 'Kota', 'Kode Pos', 'Provinsi',
+                          'Durasi Huni', 'Universitas', 'Fakultas', 'Peran', 'Nomor Kamar']
+
+        # Membuat DataFrame untuk detail pengguna yang dipilih
+        selected_user_df = pd.DataFrame(selected_user_data, columns=detail_columns)
+
+        # Mengubah nilai yang kosong menjadi 0 dan mengonversi kolom Nomor Kamar menjadi integer
+        selected_user_df['Nomor Kamar'] = selected_user_df['Nomor Kamar'].fillna(0).astype(int)
+
+        # Tampilkan detail pengguna yang dipilih
+        print("\nDetail Pengguna yang Dipilih:")
+        for index, row in selected_user_df.iterrows():
+            print("{:<15}: {}".format("Nama", row['Nama Pengguna']))
+            print("{:<15}: {}".format("No Kamar", row['Nomor Kamar']))
+            print("{:<15}: {}".format("Fakultas", row['Fakultas']))
+            print("{:<15}: {}".format("Universitas", row['Universitas']))
+            print("{:<15}: {}".format("Provinsi", row['Provinsi']))
+            print("{:<15}: {}".format("Durasi Huni", row['Durasi Huni']))
+            print("{:<15}: {}".format("Nomor Telepon", row['Nomor Telepon']))
+            print("{:<15}: {}".format("Jalan", row['Jalan']))
+            print("{:<15}: {}".format("Kota", row['Kota']))
+            print("{:<15}: {}".format("Kode Pos", row['Kode Pos']))
+        id_user = int(selected_user_id)
+        print("-----------------------------------")
+        print("1. Ubah Alamat")
+        print("2. Ubah Nomor Telepon")
+        print("3. Ubah Durasi Huni")
+        print("4. Ubah Universitas")
+        print("5. Ubah Fakultas")
+        print("6. Ubah Peran")
+        print("7. Ubah Nomor Kamar")
+        print("8. Ubah Nama")
+        menu_edit = input("Pilih menu: ")
+        query_user = """Select * from users where id_user = %s"""
+        db.execute(query_user, (id_user,))
+        data_user = db.fetch_one() 
+        print(data_user)
+        match menu_edit:
+            case "1":
+                id_alamat = data_user[3]
+                jalan = input("Masukkan Jalan: ")
+                kota = input("Masukkan Kota: ")
+                kode_pos = input("Masukkan Kode Pos: ")
+                provinsi = input("Masukkan Provinsi: ")
+                query_alamat = """UPDATE alamat SET jalan = %s, kota = %s, kode_pos = %s, provinsi = %s WHERE id_alamat = %s"""
+                db.execute(query_alamat, (jalan, kota, kode_pos, provinsi, id_alamat))
+                db.connection.commit()
+                print("Alamat berhasil diubah.")
+            case "2":
+                query_nomor = """UPDATE users SET no_telepon = %s WHERE id_user = %s"""
+                db.execute(query_nomor, (input("Masukkan Nomor Telepon: "), id_user))
+                db.connection.commit()
+                print("Nomor Telepon berhasil diubah.")
+            case "3":
+                query_durasi = """UPDATE users SET durasi_huni = %s WHERE id_user = %s"""
+                db.execute(query_durasi, (input("Masukkan Durasi Huni (YYYY:MM:DD): "), id_user))
+                db.connection.commit()
+                print("Durasi Huni berhasil diubah.")
+            case "4":
+                query_universitas = """UPDATE users SET id_universitas = %s WHERE id_user = %s"""
+                id_universitas = create_or_get_universitas(db, input("Masukkan Nama Universitas: "))
+                db.execute(query_universitas, (id_universitas, id_user))
+                db.connection.commit()
+                print("Universitas berhasil diubah.")
+            case "5":
+                query_fakultas = """UPDATE users SET id_fakultas = %s WHERE id_user = %s"""
+                id_faku = create_or_get_fakultas(db, input("Masukkan Nama Fakultas: "))
+                db.execute(query_fakultas, (id_faku, id_user))
+                db.connection.commit()
+                print("Fakultas berhasil diubah.")
+            case "6":
+                query_role = """UPDATE users SET id_role = %s WHERE id_user = %s"""
+                print("1. Penghuni")
+                print("2. Admin")
+                db.execute(query_role, (input("Masukkan ID Role: "), id_user))
+                db.connection.commit()
+                print("Role berhasil diubah.")
+            case "7":
+                query_kamar = """UPDATE users SET no_kamar = %s WHERE id_user = %s"""
+                db.execute(query_kamar, (input("Masukkan Nomor Kamar: "), id_user))
+                db.connection.commit()
+                print("Nomor Kamar berhasil diubah.")
+            case "8":
+                query_nama = """UPDATE users SET nama_user = %s WHERE id_user = %s"""
+                db.execute(query_nama, (input("Masukkan Nama: "), id_user))
+                db.connection.commit()
+                print("Nama berhasil diubah.")
+            case default:
+                print("Menu tidak tersedia.")
+    except Exception as e:
+        print("Error:", e)
+
+
 

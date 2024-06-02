@@ -14,6 +14,7 @@ class Database:
         self.password = password if password else config['password']
         self.host = host if host else config['host']
         self.port = port if port else config['port']
+        self.ssl = "require"
         self.connection = None
         self.cursor = None
 
@@ -30,10 +31,18 @@ class Database:
             self.cursor = self.connection.cursor()
             self.cursor.execute("SELECT version();")
             self.connection.commit()
-            version = self.cursor.fetchone()
-            print("Koneksi database berhasil.",version)
+            return True
+            # version = self.cursor.fetchone()
         except (Exception, psycopg2.Error) as error:
-            print("Koneksi database gagal:", error)
+            return False
+
+    def check_connection(self):
+        try:
+            # Try to execute a simple command to check if the connection is active
+            self.connection.cursor().execute('SELECT 1')
+        except Exception as e:
+            # If an exception is raised, the connection is not active. Reopen it.
+            self.open()
 
     def close(self):
         if self.connection:
