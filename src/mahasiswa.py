@@ -85,7 +85,10 @@ def create_user(db, id_user, nama_user, no_telepon, id_alamat, durasi_huni, id_u
 def register_user(db):
     try:
         role = 'penghuni'
-        nokamar
+        def daftar_kamar():
+            print_kamar(db)
+            nokamar = input("Pilih No Kamar")
+            return nokamar
         user_details = {
             'id_user': int(input("Masukkan ID Pengguna: ")),
             'nama_user': input("Masukkan Nama Pengguna: "),
@@ -100,8 +103,6 @@ def register_user(db):
             'nama_role': role,
             'no_kamar': nokamar 
         }
-        print(print_kamar())
-        nokamar = input(" Pilih No Kamar")
         
         try:
             # Begin transaction
