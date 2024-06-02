@@ -14,6 +14,7 @@ class Database:
         self.password = password if password else config['password']
         self.host = host if host else config['host']
         self.port = port if port else config['port']
+        self.ssl = "require"
         self.connection = None
         self.cursor = None
 
