@@ -1,8 +1,24 @@
 import pandas as pd
 
+def view_status_pembayaran(db,id=None):
+    db.check_connection()
+    if id is not None:
+        query = f"SELECT * FROM transaksi WHERE id_transaksi = {id}"
+    else:
+        query = "SELECT * FROM transaksi"
+    db.execute(query)
+    data = db.fetch_data()
+    df = pd.DataFrame(data, columns=['id_transaksi', 'id_user','total_pembayaran','status_transaksi'])
+    print(df)
+
 def update_status_pembayaran(db):
     db.check_connection()
-
+    # id_transaksi = input("Masukkan ID Transaksi kosongi untuk semua: ")
+    # if id_transaksi == "":
+    #     view_status_pembayaran(db, id=None)
+    # else:
+    #     view_status_pembayaran(db, id=id_transaksi)
+    view_status_pembayaran(db, id=None)
     try:
         id_transaksi = int(input("Masukkan ID Transaksi: "))
         status_transaksi_input = input("Masukkan Status Transaksi (True untuk Sudah Bayar, False untuk Belum Bayar): ").strip().lower()
@@ -35,12 +51,15 @@ def update_status_pembayaran(db):
 #     df = pd.DataFrame(data, columns=['a', 'NIM','c','Status Pembayaran'])
 #     print(df[['NIM','Status Pembayaran']])
 
-def cek_status_transaksi(db,nim):
+def cek_status_transaksi(db,nim=None):
     db.check_connection()
-    query = f"select * from transaksi where id_user = {nim}"
-    db.execute(query) 
+    if nim is not None:        
+        query = f"select * from transaksi where id_user = {nim}"
+
+    else:
+        query = "select * from transaksi"
+    db.execute(query)
     data = db.fetch_data()
-    print(data)
     df = pd.DataFrame(data, columns=['id', 'NIM','Total Pembayaran','Status Pembayaran'])
     print(df)
 

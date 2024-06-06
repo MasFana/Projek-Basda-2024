@@ -6,6 +6,8 @@ def print_kamar(db):
     df = pd.DataFrame(data, columns=['no_kamar', 'Status', 'Harga'])
     print(df)
 
+# CREATE DATA
+
 def create_universitas(db, nama_universitas):
     query = "INSERT INTO universitas (nama_universitas) VALUES (%s) RETURNING id_universitas"
     db.execute(query, (nama_universitas,))
@@ -30,6 +32,8 @@ def create_role(db, nama_role):
         return result[0]
     return None
 
+# CHECK IF DATA EXISTS
+
 def check_universitas_exists(db, nama_universitas):
     query = "SELECT id_universitas FROM universitas WHERE nama_universitas ILIKE %s"
     db.execute(query, ('%' + nama_universitas + '%',))
@@ -44,6 +48,8 @@ def check_role_exists(db, nama_role):
     query = "SELECT id_role FROM role WHERE nama_role ILIKE %s"
     db.execute(query, ('%' + nama_role + '%',))
     return db.fetch_one()
+
+# CHECK IF DATA EXISTS OR CREATE NEW DATA
 
 def create_or_get_universitas(db, nama_universitas):
     existing = check_universitas_exists(db, nama_universitas)
@@ -316,9 +322,8 @@ def edit_users(db):
         print("3. Ubah Durasi Huni")
         print("4. Ubah Universitas")
         print("5. Ubah Fakultas")
-        print("6. Ubah Peran")
-        print("7. Ubah Nomor Kamar")
-        print("8. Ubah Nama")
+        print("6. Ubah Nomor Kamar")
+        print("7. Ubah Nama")
         menu_edit = input("Pilih menu: ")
         query_user = """Select * from users where id_user = %s"""
         db.execute(query_user, (id_user,))
@@ -358,18 +363,11 @@ def edit_users(db):
                 db.connection.commit()
                 print("Fakultas berhasil diubah.")
             case "6":
-                query_role = """UPDATE users SET id_role = %s WHERE id_user = %s"""
-                print("1. Penghuni")
-                print("2. Admin")
-                db.execute(query_role, (input("Masukkan ID Role: "), id_user))
-                db.connection.commit()
-                print("Role berhasil diubah.")
-            case "7":
                 query_kamar = """UPDATE users SET no_kamar = %s WHERE id_user = %s"""
                 db.execute(query_kamar, (input("Masukkan Nomor Kamar: "), id_user))
                 db.connection.commit()
                 print("Nomor Kamar berhasil diubah.")
-            case "8":
+            case "7":
                 query_nama = """UPDATE users SET nama_user = %s WHERE id_user = %s"""
                 db.execute(query_nama, (input("Masukkan Nama: "), id_user))
                 db.connection.commit()

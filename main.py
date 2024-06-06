@@ -122,51 +122,94 @@ def menu_admin():
 
 def menu_staff(id_user):
     print("Selamat datang di menu staff!")
-    print("1. Edit User")
-    print("2. Pembayaran")
-    print("3. Aspirasi")
-    print("4. Keluar")
+    print("1. Register User")
+    print("2. Edit User")
+    print("3. Pembayaran")
+    print("4. Manajemen Barang")
+    print("5. Aspirasi")
+    print("6. Keluar")
 
     pilihan = input("Masukkan pilihan Anda: ")
-    
     if pilihan == '1':
+        db.check_connection()
+        print(register_user(db))
+        input('Enter untuk kembali')
+        clear()
+    elif pilihan == '2':
         db.check_connection()
         print(edit_users(db))
         input('Enter untuk kembali')
-        clear( )
+        clear()
     
-    elif pilihan == '2':
-        db.check_connection()
-        print(update_status_pembayaran(db))
-        input('Enter untuk kembali')
-        clear( )
-
     elif pilihan == '3':
         db.check_connection()
-        print("1. jenis barang")
-        print("2. Tambah barang")
-        print("3. Edit barang")
-        print("4. Hapus barang")
-        sub_pilihan = input("Masukkan pilihan Anda: ")
+        print('1. Lihat Pembayaran')
+        print('2. Update Status Pembayaran')
+        sub_pilihan = input("Masukkan pilihan Anda: ")  
         if sub_pilihan == '1':
-            print(read_jenis_barang(db))
+            print(cek_status_transaksi(db))
             input('Enter untuk kembali')
         elif sub_pilihan == '2':
-            print(create_jenis_barang(db))
-            input('Enter untuk kembali')
-        elif sub_pilihan == '3':
-            print(edit_jenis_barang(db))
-            input('Enter untuk kembali')
-        elif sub_pilihan == '4':
-            print(delete_jenis_barang(db))
+            print(update_status_pembayaran(db))
             input('Enter untuk kembali')
         else:
             print("Pilihan tidak valid!")
             print('Tekan enter untuk kembali')
-            
+        clear()
+
     elif pilihan == '4':
         db.check_connection()
-        cek_status_transaksi(db)
+        print("1. Barang")
+        print("2. Jenis")
+        sub_pilihan = input("Masukkan pilihan Anda: ")
+        if sub_pilihan == '1':
+            print("1. Lihat Barang")
+            print("2. Tambah Barang")
+            print("3. Edit Barang")
+            print("4. Hapus Barang")
+            sub_pilihan = input("Masukkan pilihan Anda: ")
+            if sub_pilihan == '1':
+                print(read_barang(db))
+                input()
+            elif sub_pilihan == '2':
+                print(create_barang(db))
+                input()
+            elif sub_pilihan == '3':
+                print(edit_barang(db))
+                input()
+            elif sub_pilihan == '4':
+                print(delete_barang(db))
+                input()
+            else:
+                print("Pilihan tidak valid!")
+                print('Tekan enter untuk kembali')
+            clear()
+        elif sub_pilihan == '2':
+            print("1. Lihat Jenis")
+            print("2. Tambah Jenis")
+            print("3. Edit Jenis")
+            print("4. Hapus Jenis")
+            sub_pilihan = input("Masukkan pilihan Anda: ")
+            if sub_pilihan == '1':
+                print(read_jenis_barang(db))
+                input()
+            elif sub_pilihan == '2':
+                print(create_jenis_barang(db))
+                input()
+            elif sub_pilihan == '3':
+                print(edit_jenis_barang(db))
+                input()
+            elif sub_pilihan == '4':
+                print(delete_jenis_barang(db))
+                input()
+            else:
+                print("Pilihan tidak valid!")
+                print('Tekan enter untuk kembali')
+            clear()
+            
+    elif pilihan == '5':
+        db.check_connection()
+        print(read_aspirasi(db))
         input()
     
     else:

@@ -14,15 +14,22 @@ def create_jenis_barang(db):
     nama_jenis_barang = input("Masukkan nama jenis_barang: ")
     try:
         query = "INSERT INTO jenis_barang (nama_jenis_barang) VALUES (%s) RETURNING id_jenis_barang"
-        db.execute(query, (nama_jenis_barang))
-        id_jenis_barang = db.fetch_one()[0]
-        db.connection.commit()
-        print("Jenis Barang berhasil ditambahkan dengan ID:", id_jenis_barang)
-        return id_jenis_barang
+        db.execute(query, (nama_jenis_barang,))
+        result = db.fetch_one()
+        if result is not None and not isinstance(result, bool):
+            id_jenis_barang = result[0]
+            db.connection.commit()
+            print("Jenis Barang berhasil ditambahkan dengan ID:", id_jenis_barang)
+            return id_jenis_barang
+        else:
+            print("Nama jenis_barang sudah ada.")
+            return None
     except Exception as e:
         db.connection.rollback()
         print("Gagal menambahkan jenis_barang:", e)
         return None
+    
+    
 def edit_jenis_barang(db):
     read_jenis_barang(db)
     id_jenis_barang = input("Masukkan ID jenis_barang yang akan diubah: ")
