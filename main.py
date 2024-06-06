@@ -216,7 +216,7 @@ def menu_pengunjung():
 
 def menu():
     menu_pengunjung()
-    print("Selamat datang di menu penghuni!")
+    print("Selamat datang di menu pengunjung!")
     log = input("Apakah Anda ingin login? (y/n): ")
     if log == 'y':
         db.check_connection()
